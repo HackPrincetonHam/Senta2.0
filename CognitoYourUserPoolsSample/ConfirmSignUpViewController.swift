@@ -59,7 +59,7 @@ class ConfirmSignUpViewController : UIViewController {
                     
                     strongSelf.present(alertController, animated: true, completion:  nil)
                 } else {
-                    let _ = strongSelf.navigationController?.popToRootViewController(animated: true)
+                    self?.performSegue(withIdentifier: "roleSelectorSegue", sender: nil)
                 }
             })
             return nil
@@ -86,6 +86,7 @@ class ConfirmSignUpViewController : UIViewController {
                     let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
                     alertController.addAction(okAction)
                     self?.present(alertController, animated: true, completion: nil)
+                
                 }
             })
             return nil
