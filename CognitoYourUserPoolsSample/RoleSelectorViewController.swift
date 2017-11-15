@@ -1,11 +1,3 @@
-//
-//  RoleSelectorViewController.swift
-//  CognitoYourUserPoolsSample
-//
-//  Created by 何幸宇 on 11/11/17.
-//  Copyright © 2017 Dubal, Rohan. All rights reserved.
-//
-
 import UIKit
 
 class RoleSelectorViewController: UIViewController {
@@ -21,6 +13,11 @@ class RoleSelectorViewController: UIViewController {
     }
     @IBAction func chooseRoleBtnTapped(_ sender:UIButton){
         save_role_DDB(role: sender.currentTitle!, completion: {return})
+        if sender.currentTitle! == "Senta"{
+            performSegue(withIdentifier: "sentaSegue", sender: nil)
+        }else{
+            performSegue(withIdentifier: "reindeerSegue", sender: nil)
+        }
     }
   
 }

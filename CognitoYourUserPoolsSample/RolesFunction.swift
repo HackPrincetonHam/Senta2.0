@@ -1,11 +1,3 @@
-//
-//  AWSDynamoDB.swift
-//  CognitoYourUserPoolsSample
-//
-//  Created by 何幸宇 on 11/3/17.
-//  Copyright © 2017 Dubal, Rohan. All rights reserved.
-//
-
 import Foundation
 import AWSCore
 import AWSDynamoDB
@@ -28,53 +20,51 @@ func save_role_DDB(role: String, completion: @escaping ()->Void){
             completion()
         }
     }
-    
 }
 
-//func save_gift_DDB(likes: Array<String>, dislikes: Array<String>, price_range: String, completion: ()->Void) {
-//
-//    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
-//    let GiftDataItem : GiftData = GiftData()
-//
-//    GiftDataItem._userId = UserInfor["sub"]!
-//    GiftDataItem._likes = likes
-//    GiftDataItem._dislikes = dislikes
-//    GiftDataItem._price_range = price_range
-//
-//    dynamoDBObjectMapper.save(GiftDataItem) { (error) in
-//
-//        if error != nil {
-//            print(error!)
-//            return
-//        } else {
-//            print("SAVED!")
-//        }
-//    }
-//    completion()
-//}
+func save_gift_DDB(likes: Array<String>, dislikes: Array<String>, price_range: String, completion: ()->Void) {
 
-//func save_reindeer_DDB(drop_date: String, drop_location: String, drop_time_range: String, identity: String, completion: ()->Void) {
-//
-//    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
-//    let ReindeerDataItem : ReindeerData = ReindeerData()
-//
-//    ReindeerDataItem._userId = UserInfor["sub"]!
-//    ReindeerDataItem._drop_date = drop_date
-//    ReindeerDataItem._drop_location = drop_location
-//    ReindeerDataItem._drop_time_range = drop_time_range
-//    ReindeerDataItem._identity = identity
-//
-//    dynamoDBObjectMapper.save(ReindeerDataItem) { (error) in
-//
-//        if error != nil {
-//            print(error!)
-//            return
-//        } else {
-//            print("SAVED!")
-//        }
-//    }
-//    completion()
-//}
+    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
+    let GiftDataItem : GiftData = GiftData()
+
+    GiftDataItem._userId = UserInfor["sub"]!
+    GiftDataItem._likes = likes
+    GiftDataItem._dislikes = dislikes
+    GiftDataItem._price_range = price_range
+
+    dynamoDBObjectMapper.save(GiftDataItem) { (error) in
+
+        if error != nil {
+            print(error!)
+            return
+        } else {
+            print("SAVED!")
+        }
+    }
+    completion()
+}
+
+func save_reindeer_DDB(drop_date: NSNumber, drop_location: String, identity: String, completion: ()->Void) {
+
+    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
+    let ReindeerDataItem : ReindeerData = ReindeerData()
+
+    ReindeerDataItem._userId = UserInfor["sub"]!
+    ReindeerDataItem._drop_time = drop_date
+    ReindeerDataItem._drop_location = drop_location
+    ReindeerDataItem._identity = identity
+
+    dynamoDBObjectMapper.save(ReindeerDataItem) { (error) in
+
+        if error != nil {
+            print(error!)
+            return
+        } else {
+            print("SAVED!")
+        }
+    }
+    completion()
+}
 
 
 func read_DDB( completion:@escaping (Roles)->Void){
@@ -92,17 +82,17 @@ func read_DDB( completion:@escaping (Roles)->Void){
 }
 
 //query is for viewing multiple items.
-func query_DDB(completion:@escaping (Roles)->Void){
+func query_DDB(completion:@escaping (Roles?)->Void){
     
     // 1) Configure the query
     
     let queryExpression = AWSDynamoDBQueryExpression()
     
     //you can only put rangeKey and partition key here
-    queryExpression.keyConditionExpression = "#otherID = :otherID"
+    queryExpression.keyConditionExpression = "#user_sub = :user_sub"
     
     //to use filter expression, you need to user # and in combination with attributeValues
-    queryExpression.filterExpression = "#text = :text"
+//    queryExpression.filterExpression = "#text = :text"
     
     //the otherID needs to be the name of the attribute or the name of the with the addition of "#" in the front and in combination with expressionAttributeNames. add "#attributeionName" = "attributionName"
     //    queryExpression.expressionAttributeNames = [
@@ -110,13 +100,12 @@ func query_DDB(completion:@escaping (Roles)->Void){
     //    ]
     
     queryExpression.expressionAttributeNames = [
-        "#text" : "text",
-        "#otherID" : "otherID"
+//        "#text" : "text",
+        "#user_sub" : "user_sub"
     ]
     
     queryExpression.expressionAttributeValues = [
-        ":otherID" : "4c9c7d6e-9df1-4696-b4da-ecfd55cb1b52",
-        ":text" : "a"
+        ":user_sub" : UserInfor["sub"]!
     ]
     
     // 2) Make the query
@@ -126,11 +115,12 @@ func query_DDB(completion:@escaping (Roles)->Void){
     dynamoDbObjectMapper.query(Roles.self, expression: queryExpression) { (output: AWSDynamoDBPaginatedOutput?, error: Error?) in
         if error != nil {
             print("The request failed. Error: \(String(describing: error))")
+            completion(nil)
         }
         if output != nil {
             for news in output!.items {
                 let newsItem = news as? Roles
-                completion(newsItem!)
+                completion(newsItem)
             }
         }
     }

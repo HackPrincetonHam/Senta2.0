@@ -1,21 +1,4 @@
-//
-// Copyright 2014-2017 Amazon.com,
-// Inc. or its affiliates. All Rights Reserved.
-//
-// Licensed under the Amazon Software License (the "License").
-// You may not use this file except in compliance with the
-// License. A copy of the License is located at
-//
-//     http://aws.amazon.com/asl/
-//
-// or in the "license" file accompanying this file. This file is
-// distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, express or implied. See the License
-// for the specific language governing permissions and
-// limitations under the License.
-//
-
-import Foundation
+import UIKit
 import AWSCognitoIdentityProvider
 
 class UserDetailTableViewController : UITableViewController {
@@ -66,6 +49,14 @@ class UserDetailTableViewController : UITableViewController {
     }
     
     // MARK: - IBActions
+    @IBOutlet weak var selectRoleBtn: UIBarButtonItem!
+    @IBAction func selectRole(_ sender: UIButton) {
+        performSegue(withIdentifier: "roleSelectorSegue", sender: nil)
+    }
+    
+    @IBAction func viewInfo(_ sender: UIButton) {
+        performSegue(withIdentifier: "infoSegue", sender: nil)
+    }
     
     @IBAction func signOut(_ sender: AnyObject) {
         self.user?.signOut()
@@ -76,14 +67,31 @@ class UserDetailTableViewController : UITableViewController {
     }
     
     func refresh() {
-        self.user?.getDetails().continueOnSuccessWith { (task) -> AnyObject? in
-            DispatchQueue.main.async(execute: {
-                self.response = task.result
-                self.title = self.user?.username
-                self.tableView.reloadData()
-            })
+        user?.getDetails().continueOnSuccessWith { (task) -> AnyObject? in
+            
+            if let response = task.result
+            {
+                for info in response.userAttributes!{
+                    UserInfor[info.name!] =  info.value!
+                }
+            }
+            query_DDB { (role) in
+                if role != nil{
+                    
+                    print("works")
+                    self.selectRoleBtn.isEnabled = false
+                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.9763647914, green: 0.9765316844, blue: 0.9763541818, alpha: 1)
+                    
+                }else{
+                    
+                    self.selectRoleBtn.isEnabled = true
+                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.3032028119, green: 0.4540847009, blue: 0.8244939446, alpha: 1)
+                    
+                }
+            }
             return nil
         }
+        
     }
     
 }
