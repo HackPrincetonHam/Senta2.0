@@ -5,13 +5,31 @@ import AWSDynamoDB
 //to update, you need to have the same sort key. Even if you have different partition key, save method would update.
 func save_role_DDB(role: String, completion: @escaping ()->Void){
     
-    
     let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
     let roleItem : Roles = Roles()
     roleItem._userId = UserInfor["sub"]!
     roleItem._role = role
     
     dynamoDBObjectMapper.save(roleItem) { (error) in
+        if error != nil{
+            print(error!)
+            return
+        }else{
+            print("SAVED!")
+            completion()
+        }
+    }
+    
+}
+
+func delete_role_DDB(role: String, completion: @escaping ()->Void){
+    
+    let dynamoDBObjectMapper = AWSDynamoDBObjectMapper.default()
+    let roleItem : Roles = Roles()
+    roleItem._userId = UserInfor["sub"]!
+    roleItem._role = role
+    
+    dynamoDBObjectMapper.remove(roleItem) { (error) in
         if error != nil{
             print(error!)
             return
@@ -83,6 +101,7 @@ func read_DDB( completion:@escaping (Roles)->Void){
 
 //query is for viewing multiple items.
 func query_DDB(completion:@escaping (Roles?)->Void){
+    print(UserInfor["sub"])
     
     // 1) Configure the query
     
@@ -118,9 +137,16 @@ func query_DDB(completion:@escaping (Roles?)->Void){
             completion(nil)
         }
         if output != nil {
+            if output!.items.count != 0{
             for news in output!.items {
-                let newsItem = news as? Roles
+                guard let newsItem = news as? Roles else {
+                    completion(nil)
+                    return
+                }
                 completion(newsItem)
+            }
+            }else{
+                completion(nil)
             }
         }
     }

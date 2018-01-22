@@ -6,6 +6,21 @@ class UserDetailTableViewController : UITableViewController {
     var response: AWSCognitoIdentityUserGetDetailsResponse?
     var user: AWSCognitoIdentityUser?
     var pool: AWSCognitoIdentityUserPool?
+    var role: Roles?{
+        didSet{
+            DispatchQueue.main.async {
+                if self.role != nil{
+                    self.selectRoleBtn.isEnabled = false
+                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.9763647914, green: 0.9765316844, blue: 0.9763541818, alpha: 1)
+
+                }else{
+                    self.selectRoleBtn.isEnabled = true
+                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.3032028119, green: 0.4540847009, blue: 0.8244939446, alpha: 1)
+            
+                }
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -15,6 +30,7 @@ class UserDetailTableViewController : UITableViewController {
             self.user = self.pool?.currentUser()
         }
         self.refresh()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -25,6 +41,7 @@ class UserDetailTableViewController : UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setToolbarHidden(false, animated: true)
+        self.refresh()
     }
     
     // MARK: - Table view data source
@@ -68,31 +85,17 @@ class UserDetailTableViewController : UITableViewController {
     
     func refresh() {
         user?.getDetails().continueOnSuccessWith { (task) -> AnyObject? in
-            
             if let response = task.result
             {
                 for info in response.userAttributes!{
                     UserInfor[info.name!] =  info.value!
                 }
             }
-            query_DDB { (role) in
-                if role != nil{
-                    
-                    print("works")
-                    self.selectRoleBtn.isEnabled = false
-                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.9763647914, green: 0.9765316844, blue: 0.9763541818, alpha: 1)
-                    
-                }else{
-                    
-                    self.selectRoleBtn.isEnabled = true
-                    self.selectRoleBtn.tintColor = #colorLiteral(red: 0.3032028119, green: 0.4540847009, blue: 0.8244939446, alpha: 1)
-                    
-                }
+            query_DDB { (passed_role) in
+            self.role = passed_role
             }
             return nil
         }
-        
     }
-    
 }
 

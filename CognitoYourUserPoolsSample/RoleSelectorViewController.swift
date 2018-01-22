@@ -12,6 +12,9 @@ class RoleSelectorViewController: UIViewController {
         let _ = self.navigationController?.popToRootViewController(animated: true)
     }
     @IBAction func chooseRoleBtnTapped(_ sender:UIButton){
+        
+        delete_role_DDB(role: sender.currentTitle!) {return}
+        
         save_role_DDB(role: sender.currentTitle!, completion: {return})
         if sender.currentTitle! == "Senta"{
             performSegue(withIdentifier: "sentaSegue", sender: nil)
@@ -19,5 +22,4 @@ class RoleSelectorViewController: UIViewController {
             performSegue(withIdentifier: "reindeerSegue", sender: nil)
         }
     }
-  
 }
