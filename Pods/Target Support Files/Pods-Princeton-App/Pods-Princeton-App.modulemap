@@ -1,0 +1,6 @@
+framework module Pods_Princeton_App {
+  umbrella header "Pods-Princeton-App-umbrella.h"
+
+  export *
+  module * { export * }
+}
