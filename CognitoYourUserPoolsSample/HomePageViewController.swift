@@ -1,7 +1,7 @@
 import UIKit
 import AWSCognitoIdentityProvider
 
-class UserDetailTableViewController : UITableViewController {
+class HomePageViewController : UIViewController {
     
     var response: AWSCognitoIdentityUserGetDetailsResponse?
     var user: AWSCognitoIdentityUser?
@@ -24,7 +24,7 @@ class UserDetailTableViewController : UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.delegate = self
+        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         self.pool = AWSCognitoIdentityUserPool(forKey: AWSCognitoUserPoolsSignInProviderKey)
         if (self.user == nil) {
             self.user = self.pool?.currentUser()
@@ -46,25 +46,9 @@ class UserDetailTableViewController : UITableViewController {
     
     // MARK: - Table view data source
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
+
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let response = self.response  {
-            return response.userAttributes!.count
-        }
-        return 0
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "attribute", for: indexPath)
-        let userAttribute = self.response?.userAttributes![indexPath.row]
-        cell.textLabel!.text = userAttribute?.name
-        cell.detailTextLabel!.text = userAttribute?.value
-        return cell
-    }
-    
+
     // MARK: - IBActions
     @IBOutlet weak var selectRoleBtn: UIBarButtonItem!
     @IBAction func selectRole(_ sender: UIButton) {
@@ -79,7 +63,7 @@ class UserDetailTableViewController : UITableViewController {
         self.user?.signOut()
         self.title = nil
         self.response = nil
-        self.tableView.reloadData()
+        
         self.refresh()
     }
     
